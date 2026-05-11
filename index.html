@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Petey — Pull data out of PDFs</title>
+  <meta name="description" content="Petey is a schema-first PDF data extraction framework. Drop a PDF in, get a row of data out. Drop a thousand PDFs in, get a table. Runs on your laptop, your cloud, or your VPC." />
+  <link rel="icon" type="image/svg+xml" href="static/favicon.svg" />
+  <link rel="icon" type="image/png" href="static/favicon.png" />
+  <link rel="apple-touch-icon" href="static/apple-touch-icon.png" />
+  <meta property="og:title" content="Petey — Pull data out of PDFs" />
+  <meta property="og:description" content="Schema-first PDF data extraction. No code. Runs anywhere." />
+  <meta property="og:image" content="static/og-image.png" />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #d8572a;
+      --orange-light: #e06b3e;
+      --orange-pale: rgba(216,87,42,0.08);
+      --cream: #f5efe6;
+      --cream-dark: #ebe2d5;
+      --ink: #1a1210;
+      --ink-mid: #4a3830;
+      --ink-light: #9a8880;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #fff;
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ─────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 40px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      text-decoration: none;
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .nav-logo .dot {
+      color: var(--orange);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      color: var(--ink-mid);
+      text-decoration: none;
+      font-weight: 400;
+      transition: color 0.15s ease;
+    }
+
+    .nav-link:hover { color: var(--ink); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      background: var(--orange);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: background 0.18s ease;
+    }
+
+    .nav-cta:hover { background: var(--orange-light); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--ink);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0; right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--cream-dark);
+      z-index: 99;
+      padding: 8px 0 16px;
+      flex-direction: column;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-size: 15px;
+      color: var(--ink-mid);
+      text-decoration: none;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* ── HERO ─────────────────────────────── */
+    .hero {
+      min-height: calc(100vh - 120px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 100px 64px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 60px;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+
+    .hero-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(38px, 5.5vw, 74px);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.2s forwards;
+    }
+
+    .hero-headline .dot { color: var(--orange); }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--ink-mid);
+      max-width: 460px;
+      margin-bottom: 28px;
+      line-height: 1.65;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.35s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.45s forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 14px 28px;
+      background: var(--orange);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: background 0.18s ease, transform 0.1s ease, box-shadow 0.18s ease;
+      box-shadow: 0 4px 20px rgba(216,87,42,0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--orange-light);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(216,87,42,0.32);
+    }
+
+    .btn-ghost {
+      font-size: 13px;
+      color: var(--ink-mid);
+      text-decoration: none;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--cream-dark);
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-ghost:hover {
+      color: var(--ink);
+      border-color: var(--ink-mid);
+    }
+
+    .hero-note {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--ink-light);
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.55s forwards;
+    }
+
+    /* ── HERO DEMO SCENE ─────────────────── */
+    .hero-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.55s forwards;
+    }
+
+    .hero-demo-scene {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 32px 28px 28px;
+    }
+
+    .hd-tag {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--ink-light);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .hd-tag::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .hd-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .hd-card {
+      background: #fff;
+      border: 1px solid var(--cream-dark);
+      border-radius: 10px;
+      padding: 12px 14px;
+      box-shadow: 0 2px 12px rgba(26,18,16,0.05);
+    }
+
+    .hd-card-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hd-card-label .pip {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--cream-dark);
+    }
+
+    .hd-card.active .hd-card-label .pip { background: var(--orange); }
+
+    .hd-code {
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--ink);
+      white-space: pre-wrap;
+      min-height: 80px;
+      transition: opacity 0.35s ease;
+    }
+
+    .hd-code .k { color: var(--orange); }
+    .hd-code .v { color: var(--ink-mid); }
+    .hd-code .c { color: var(--ink-light); font-style: italic; }
+
+    .hd-arrow {
+      align-self: center;
+      color: var(--ink-light);
+      font-size: 14px;
+    }
+
+    .hd-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .hd-table th, .hd-table td {
+      text-align: left;
+      padding: 5px 8px;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .hd-table th {
+      font-weight: 600;
+      color: var(--ink-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 9px;
+    }
+
+    .hd-table td { color: var(--ink); }
+
+    .hd-table tr:last-child td { border-bottom: none; }
+
+    /* ── HERO SLIDER ─────────────────────── */
+    .hd-slider-wrap {
+      margin-top: 14px;
+    }
+
+    .hd-track-outer {
+      position: relative;
+      height: 24px;
+    }
+
+    .hd-track-segments {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .hd-track-seg {
+      flex: 1;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--cream-dark);
+      transition: background 0.35s ease;
+    }
+
+    .hd-track-seg.s1.lit { background: rgba(216,87,42,0.35); }
+    .hd-track-seg.s2.lit { background: rgba(216,87,42,0.65); }
+    .hd-track-seg.s3.lit { background: var(--orange); }
+
+    .hd-thumb {
+      position: absolute;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--ink);
+      border: 2.5px solid var(--cream);
+      box-shadow: 0 1px 5px rgba(0,0,0,0.28);
+      transform: translate(-50%, -50%);
+      transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      pointer-events: none;
+    }
+
+    .hd-slider-labels {
+      position: relative;
+      height: 18px;
+      margin-top: 4px;
+    }
+
+    .hd-slider-label {
+      font-family: 'DM Serif Display', serif;
+      font-size: 12px;
+      color: var(--ink-light);
+      position: absolute;
+      transition: color 0.3s ease;
+    }
+
+    .hd-slider-label[data-idx="0"] { left: 0%; }
+    .hd-slider-label[data-idx="1"] { left: 50%; transform: translateX(-50%); }
+    .hd-slider-label[data-idx="2"] { right: 0%; }
+
+    .hd-slider-label.active { color: var(--ink); }
+
+    /* ── FEATURE STRIP ───────────────────── */
+    .features-strip {
+      background: var(--cream);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .feature-item {
+      flex: 1;
+      max-width: 320px;
+      padding: 0 40px;
+      border-right: 1px solid var(--cream-dark);
+    }
+
+    .feature-item:last-child { border-right: none; }
+    .feature-item:first-child { padding-left: 0; }
+
+    .feature-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .feature-title .accent { color: var(--orange); }
+
+    .feature-desc {
+      font-size: 15px;
+      color: var(--ink-mid);
+      line-height: 1.65;
+    }
+
+    /* ── SECTION SHARED ──────────────────── */
+    .section-label {
+      font-family: 'DM Serif Display', serif;
+      font-size: 14px;
+      color: var(--orange);
+      margin-bottom: 16px;
+    }
+
+    .section-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 24px;
+    }
+
+    /* ── DEMO SECTION ────────────────────── */
+    .demo-section {
+      padding: 64px 40px;
+      background: #fff;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .demo-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-top: 16px;
+    }
+
+    .demo-card {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .demo-card-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .demo-card-label .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      background: rgba(216,87,42,0.08);
+      color: var(--orange);
+    }
+
+    .demo-schema {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--cream-dark);
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--ink);
+      white-space: pre;
+      overflow-x: auto;
+      min-height: 230px;
+    }
+
+    .demo-schema .k { color: var(--orange); }
+    .demo-schema .v { color: var(--ink-mid); }
+    .demo-schema .c { color: var(--ink-light); font-style: italic; }
+
+    .demo-slider-wrap {
+      max-width: 360px;
+      margin-bottom: 18px;
+      user-select: none;
+    }
+
+    .demo-track-outer {
+      position: relative;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .demo-track-segments {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .demo-track-seg {
+      flex: 1;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--cream-dark);
+      transition: background 0.25s ease;
+    }
+
+    .demo-track-seg.s1.lit { background: rgba(216,87,42,0.35); }
+    .demo-track-seg.s2.lit { background: rgba(216,87,42,0.65); }
+    .demo-track-seg.s3.lit { background: var(--orange); }
+
+    .demo-thumb {
+      position: absolute;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--ink);
+      border: 2.5px solid var(--cream);
+      box-shadow: 0 1px 5px rgba(0,0,0,0.28);
+      transform: translate(-50%, -50%);
+      transition: left 0.2s ease;
+      pointer-events: none;
+    }
+
+    .demo-slider-labels {
+      position: relative;
+      height: 20px;
+      margin-top: 8px;
+    }
+
+    .demo-slider-label {
+      font-family: 'DM Serif Display', serif;
+      font-size: 13px;
+      color: var(--ink-light);
+      cursor: pointer;
+      transition: color 0.2s ease;
+      position: absolute;
+      white-space: nowrap;
+    }
+
+    .demo-slider-label[data-idx="0"] { left: 0%; }
+    .demo-slider-label[data-idx="1"] { left: 50%; transform: translateX(-50%); }
+    .demo-slider-label[data-idx="2"] { right: 0%; }
+
+    .demo-slider-label.active { color: var(--ink); }
+
+    .demo-output {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--cream-dark);
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    .demo-output table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .demo-output th, .demo-output td {
+      text-align: left;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .demo-output th {
+      font-weight: 600;
+      color: var(--ink-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 10px;
+    }
+
+    .demo-output td { color: var(--ink); }
+    .demo-output tr:last-child td { border-bottom: none; }
+    .demo-output td.muted { color: var(--ink-light); }
+
+    /* ── HOW IT WORKS ────────────────────── */
+    .how-section {
+      background: var(--cream);
+      padding: 64px 40px;
+    }
+
+    .how-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 48px;
+    }
+
+    .step {
+      background: #fff;
+      padding: 36px 32px;
+    }
+
+    .step:first-child { border-radius: 16px 0 0 16px; }
+    .step:last-child { border-radius: 0 16px 16px 0; }
+
+    .step-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 48px;
+      color: var(--cream-dark);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--ink-mid);
+      line-height: 1.7;
+    }
+
+    /* ── PRODUCTS / MODES ────────────────── */
+    .modes-section {
+      padding: 64px 40px;
+      background: #fff;
+    }
+
+    .modes-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .modes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .mode-card {
+      border: 1px solid var(--cream-dark);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .mode-card:hover {
+      border-color: var(--orange);
+      box-shadow: 0 8px 32px rgba(216,87,42,0.08);
+    }
+
+    .mode-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .mode-tagline {
+      font-size: 13px;
+      color: var(--ink-light);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .mode-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .mode-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--ink-mid);
+    }
+
+    .mode-pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+
+    .mode-card.featured {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .mode-card.featured .mode-name,
+    .mode-card.featured .mode-pill { color: var(--cream); }
+    .mode-card.featured .mode-tagline { color: rgba(245,239,230,0.6); }
+    .mode-card.featured .mode-pill::before { background: var(--orange-light); opacity: 1; }
+
+    .mode-link {
+      font-size: 13px;
+      color: var(--orange);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(216,87,42,0.3);
+      padding-bottom: 1px;
+      transition: color 0.15s ease;
+    }
+
+    .mode-link:hover { color: var(--orange-light); }
+
+    .mode-card.featured .mode-link {
+      color: var(--orange-light);
+      border-bottom-color: rgba(216,87,42,0.4);
+    }
+
+    /* ── PRICING ─────────────────────────── */
+    .pricing-section {
+      background: var(--cream);
+      padding: 64px 40px;
+    }
+
+    .pricing-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 40px;
+      text-align: left;
+    }
+
+    .pricing-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 36px;
+      border: 1px solid var(--cream-dark);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pricing-card.featured {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .pricing-plan {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 20px;
+    }
+
+    .pricing-card.featured .pricing-plan { color: rgba(245,239,230,0.5); }
+
+    .pricing-price {
+      font-family: 'DM Serif Display', serif;
+      font-size: 44px;
+      line-height: 1;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .pricing-card.featured .pricing-price { color: var(--cream); }
+
+    .pricing-period {
+      font-size: 13px;
+      color: var(--ink-light);
+      margin-bottom: 28px;
+    }
+
+    .pricing-card.featured .pricing-period { color: rgba(245,239,230,0.55); }
+
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex: 1;
+    }
+
+    .pricing-features li {
+      font-size: 14px;
+      color: var(--ink-mid);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .pricing-features li::before {
+      content: "✓";
+      color: var(--orange);
+      font-weight: 500;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pricing-card.featured .pricing-features li { color: rgba(245,239,230,0.78); }
+    .pricing-card.featured .pricing-features li::before { color: var(--orange-light); }
+
+    .pricing-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      transition: all 0.18s ease;
+    }
+
+    .pricing-btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--cream-dark);
+    }
+
+    .pricing-btn-outline:hover {
+      border-color: var(--ink-mid);
+      background: var(--cream);
+    }
+
+    .pricing-btn-filled {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 16px rgba(216,87,42,0.25);
+    }
+
+    .pricing-btn-filled:hover {
+      background: var(--orange-light);
+      box-shadow: 0 6px 20px rgba(216,87,42,0.32);
+    }
+
+    .pricing-byok {
+      margin-top: 28px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--ink-mid);
+      line-height: 1.6;
+      text-align: left;
+      border: 1px solid var(--cream-dark);
+    }
+
+    .pricing-byok strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    /* ── SECURITY ────────────────────────── */
+    .security-section {
+      background: #fff;
+      padding: 48px 40px;
+    }
+
+    .security-header {
+      font-family: 'DM Serif Display', serif;
+      font-size: 14px;
+      color: var(--orange);
+      text-align: center;
+      margin-bottom: 12px;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .security-subhead {
+      text-align: center;
+      font-size: 28px;
+      font-family: 'DM Serif Display', serif;
+      font-weight: 400;
+      color: var(--ink);
+      max-width: 540px;
+      margin: 0 auto 32px;
+      line-height: 1.35;
+    }
+
+    .security-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 540px;
+    }
+
+    .security-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--ink-mid);
+      line-height: 1.6;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .security-list li:last-child { border-bottom: none; }
+
+    .security-check {
+      color: var(--orange);
+      font-family: 'DM Serif Display', serif;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── ABOUT ───────────────────────────── */
+    .about-section {
+      background: var(--cream);
+      padding: 64px 40px;
+    }
+
+    .about-header {
+      font-family: 'DM Serif Display', serif;
+      font-size: 14px;
+      color: var(--orange);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .about-inner {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .about-body {
+      font-size: 16px;
+      color: var(--ink-mid);
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+
+    .about-body a {
+      color: var(--orange);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(216,87,42,0.3);
+    }
+
+    .about-body a:hover { color: var(--orange-light); }
+
+    /* ── FOOTER ──────────────────────────── */
+    footer {
+      background: var(--ink);
+      padding: 48px 40px;
+      color: rgba(245,239,230,0.55);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--cream);
+    }
+
+    .footer-logo .dot { color: var(--orange); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      font-size: 13px;
+    }
+
+    .footer-links a {
+      color: rgba(245,239,230,0.6);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover { color: var(--cream); }
+
+    .footer-note { font-size: 13px; }
+
+    /* ── ANIMATIONS ──────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ──────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .hero { grid-template-columns: 1fr; padding: 80px 24px 32px; gap: 32px; max-width: none; }
+      .hero-right { display: none; }
+      .features-strip { flex-direction: column; padding: 40px 20px; gap: 24px; }
+      .feature-item { border-right: none; border-bottom: 1px solid var(--cream-dark); padding: 0 0 24px; max-width: none; }
+      .feature-item:last-child { border-bottom: none; }
+      .demo-wrapper { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .step:first-child { border-radius: 16px 16px 0 0; }
+      .step:last-child { border-radius: 0 0 16px 16px; }
+      .modes-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .demo-section, .how-section, .modes-section, .pricing-section, .about-section { padding: 48px 20px; }
+      .security-section { padding: 40px 20px; }
+      .pricing-card { padding: 24px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Petey<span class="dot">.</span></a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#product" class="nav-link">Product</a>
+        <a href="#how" class="nav-link">How it works</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#about" class="nav-link">About</a>
+      </div>
+      <a href="https://petey.cc/demos" class="nav-cta">Try the demo →</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#product" onclick="closeMobileMenu()">Product</a>
+    <a href="#how" onclick="closeMobileMenu()">How it works</a>
+    <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+    <a href="#about" onclick="closeMobileMenu()">About</a>
+    <a href="https://petey.cc/demos">Try the demo →</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Schema-first PDF extraction</div>
+      <h1 class="hero-headline">
+        Your PDFs in.<br>
+        Your data out<span class="dot">.</span>
+      </h1>
+      <p class="hero-sub">
+        Petey turns PDFs into structured data. Drop one in, get a row out. Drop a thousand in, get a table. No code. Runs on your laptop, your cloud, or your VPC.
+      </p>
+      <div class="hero-actions">
+        <a href="https://petey.cc/demos" class="btn-primary">
+          <strong>Try the demo.</strong> No install
+        </a>
+        <a href="#how" class="btn-ghost">See how it works ↓</a>
+      </div>
+      <p class="hero-note">Free for individuals. Open source. Bring your own API keys.</p>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-demo-scene">
+        <div class="hd-tag">petey extract</div>
+
+        <div class="hd-flow">
+          <div class="hd-card" id="hd-schema-card">
+            <div class="hd-card-label"><span class="pip"></span> Schema</div>
+            <div class="hd-code" id="hd-schema"></div>
+          </div>
+
+          <div class="hd-arrow">↓</div>
+
+          <div class="hd-card active" id="hd-output-card">
+            <div class="hd-card-label"><span class="pip"></span> Output (CSV)</div>
+            <div id="hd-output"></div>
+          </div>
+        </div>
+
+        <div class="hd-slider-wrap">
+          <div class="hd-track-outer" id="hd-track">
+            <div class="hd-track-segments">
+              <div class="hd-track-seg s1" id="hd-seg1"></div>
+              <div class="hd-track-seg s2" id="hd-seg2"></div>
+              <div class="hd-track-seg s3" id="hd-seg3"></div>
+            </div>
+            <div class="hd-thumb" id="hd-thumb"></div>
+          </div>
+          <div class="hd-slider-labels">
+            <span class="hd-slider-label active" data-idx="0">Clinical</span>
+            <span class="hd-slider-label" data-idx="1">Budget</span>
+            <span class="hd-slider-label" data-idx="2">Disclosure</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE STRIP -->
+  <div class="features-strip" id="product">
+    <div class="feature-item">
+      <div class="feature-title">Schema-<span class="accent">first</span></div>
+      <div class="feature-desc">You decide what fields to pull. Petey doesn't guess — it follows the spec you give it.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-title">Runs <span class="accent">anywhere</span></div>
+      <div class="feature-desc">Your laptop, your cloud, your VPC. Local extraction works on consumer hardware.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-title">Platform <span class="accent">agnostic</span></div>
+      <div class="feature-desc">Swap parsers and LLMs in one line. OpenAI, Anthropic, Datalab, Ollama, and more.</div>
+    </div>
+  </div>
+
+  <!-- DEMO -->
+  <section class="demo-section" id="demo">
+    <div class="section-label fade-in">Product</div>
+    <h2 class="section-headline fade-in">Define what you want.<br>Get exactly that.</h2>
+
+    <p style="font-size:16px; color:var(--ink-mid); max-width:620px; line-height:1.65; margin-bottom:32px;" class="fade-in">
+      A schema is a plain YAML file describing the fields you care about. The same Petey runs against any document: clinical records, city budgets, congressional disclosures — change the schema, not the code.
+    </p>
+
+    <div class="demo-wrapper">
+      <div class="demo-card fade-in">
+        <div class="demo-card-label">
+          Schema (YAML)
+          <span class="badge">input</span>
+        </div>
+        <div class="demo-schema" id="demo-schema"></div>
+      </div>
+
+      <div class="demo-card fade-in">
+        <div class="demo-card-label">
+          Extracted rows
+          <span class="badge">output</span>
+        </div>
+        <div class="demo-slider-wrap">
+          <div class="demo-track-outer" id="demo-track">
+            <div class="demo-track-segments">
+              <div class="demo-track-seg s1" id="seg1"></div>
+              <div class="demo-track-seg s2" id="seg2"></div>
+              <div class="demo-track-seg s3" id="seg3"></div>
+            </div>
+            <div class="demo-thumb" id="demo-thumb"></div>
+          </div>
+          <div class="demo-slider-labels">
+            <span class="demo-slider-label active" data-idx="0">Clinical</span>
+            <span class="demo-slider-label" data-idx="1">Budget</span>
+            <span class="demo-slider-label" data-idx="2">Disclosure</span>
+          </div>
+        </div>
+        <div class="demo-output" id="demo-output"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section" id="how">
+    <div class="how-inner">
+      <div class="section-label fade-in">How it works</div>
+      <h2 class="section-headline fade-in">Three steps.<br>One spreadsheet.</h2>
+      <div class="steps">
+        <div class="step fade-in">
+          <div class="step-num">01</div>
+          <div class="step-title">Write or pick a schema</div>
+          <div class="step-desc">Describe the fields you want in plain YAML. Or pull a prebuilt schema from the library — CMS-1500, FEC filings, court dockets, more.</div>
+        </div>
+        <div class="step fade-in">
+          <div class="step-num">02</div>
+          <div class="step-title">Drop in your PDFs</div>
+          <div class="step-desc">One file or a thousand. Petey wires the parser of your choice to the LLM of your choice and runs everything in parallel.</div>
+        </div>
+        <div class="step fade-in">
+          <div class="step-num">03</div>
+          <div class="step-title">Get a CSV or JSON</div>
+          <div class="step-desc">Structured rows, ready for your spreadsheet, your warehouse, your RAG pipeline, or whatever comes next.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODES -->
+  <section class="modes-section">
+    <div class="modes-inner">
+      <div class="section-label fade-in">Two ways to run it</div>
+      <h2 class="section-headline fade-in">One tool. Easy mode<br>and pro mode.</h2>
+      <div class="modes-grid">
+        <div class="mode-card fade-in">
+          <div class="mode-name">Easy mode</div>
+          <div class="mode-tagline">For people who'd rather not write Python.</div>
+          <div class="mode-pills">
+            <div class="mode-pill">Desktop app for Mac &amp; Windows</div>
+            <div class="mode-pill">Drag-and-drop extraction</div>
+            <div class="mode-pill">Schema builder in the UI</div>
+            <div class="mode-pill">Bring-your-own API keys</div>
+          </div>
+          <a href="https://petey.cc" class="mode-link">Try the web app →</a>
+        </div>
+        <div class="mode-card featured fade-in">
+          <div class="mode-name">Pro mode</div>
+          <div class="mode-tagline">For engineers wiring it into a pipeline.</div>
+          <div class="mode-pills">
+            <div class="mode-pill">Python package, <code style="font-family:var(--mono); font-size:12px; opacity:0.9;">pip install petey</code></div>
+            <div class="mode-pill">CLI and Python API</div>
+            <div class="mode-pill">Drop into your RAG or ML pipeline</div>
+            <div class="mode-pill">Swap parsers and LLMs at runtime</div>
+          </div>
+          <a href="https://github.com/afriedman412/petey" class="mode-link">View on GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-inner">
+      <div class="section-label fade-in" style="text-align:center;">Pricing</div>
+      <h2 class="section-headline fade-in" style="text-align:center;">Free for you.<br>Priced for the enterprise.</h2>
+
+      <div class="pricing-grid fade-in">
+        <div class="pricing-card">
+          <div class="pricing-plan">Open source</div>
+          <div class="pricing-price">$0</div>
+          <div class="pricing-period">Apache 2.0, forever</div>
+          <ul class="pricing-features">
+            <li>Free for individuals and small teams</li>
+            <li>Full framework, CLI, and desktop app</li>
+            <li>Schema library + community schemas</li>
+            <li>Bring your own API keys</li>
+            <li>Self-host the web app via Docker</li>
+          </ul>
+          <a href="https://github.com/afriedman412/petey-app/releases/latest" class="pricing-btn pricing-btn-outline">Download Petey</a>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="pricing-plan">Commercial</div>
+          <div class="pricing-price">$15k–75k</div>
+          <div class="pricing-period">per organization / year</div>
+          <ul class="pricing-features">
+            <li>Everything in open source</li>
+            <li>Indemnification &amp; support contract</li>
+            <li>Compliance documentation for audit teams</li>
+            <li>Custom schemas for your formats</li>
+            <li>Deploy in your VPC — data never leaves</li>
+          </ul>
+          <a href="#about" class="pricing-btn pricing-btn-filled">Talk to us</a>
+        </div>
+      </div>
+
+      <div class="pricing-byok fade-in">
+        <strong>Bring Your Own API Key (BYOK)</strong>
+        Petey doesn't mark up inference. You pay OpenAI, Anthropic, Datalab, or whoever you use directly. Typical cost: <strong>1–5¢ per page</strong>. Run fully local with Ollama for $0.
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY -->
+  <section class="security-section">
+    <div class="security-header fade-in">Privacy by architecture</div>
+    <div class="security-subhead fade-in">Your documents stay yours.<br>By structure, not by policy.</div>
+    <ul class="security-list fade-in">
+      <li><span class="security-check">✓</span>Petey is a tool, not a service. We never see your documents.</li>
+      <li><span class="security-check">✓</span>Run fully local — no data leaves your machine.</li>
+      <li><span class="security-check">✓</span>Or call commercial APIs directly with your own keys.</li>
+      <li><span class="security-check">✓</span>Self-hosted in your VPC for enterprise compliance work.</li>
+      <li><span class="security-check">✓</span>Open source under Apache 2.0. Audit every line.</li>
+    </ul>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section" id="about">
+    <div class="about-header fade-in">About</div>
+    <div class="about-inner">
+      <p class="about-body fade-in">Hi, I'm <a href="https://github.com/afriedman412">Adam</a>.</p>
+      <p class="about-body fade-in">I've spent years pulling data out of PDFs — for journalism, for research, for clients. Every time I started a new project, I built the same pipeline from scratch. Parser, prompt, glue code, output. Throw away. Repeat.</p>
+      <p class="about-body fade-in">The pieces are all there. Open-source parsers are reliable. Small LLMs can run on a laptop. Per-document cost is pennies. The only missing piece is a tool that wires them together and lets you describe what you want.</p>
+      <p class="about-body fade-in">That's Petey. <a href="mailto:adam@petey.cc">LMK</a> what you think — and if you've got a document type you can't crack, send it over.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">Petey<span class="dot">.</span></div>
+      <div class="footer-links">
+        <a href="https://petey.cc">Web app</a>
+        <a href="https://github.com/afriedman412/petey">GitHub</a>
+        <a href="https://pypi.org/project/petey/">PyPI</a>
+        <a href="https://hub.docker.com/r/afriedman412/petey">Docker</a>
+      </div>
+      <div class="footer-note">Because PDFs are terrible.</div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Mobile menu ──────────────────────
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+    function closeMobileMenu() {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    }
+
+    // ── Schema + output content per document type ──
+    const docs = {
+      clinical: {
+        schema:
+`<span class="c"># clinical_note.yaml</span>
+<span class="k">name</span>: <span class="v">ClinicalNote</span>
+<span class="k">mode</span>: <span class="v">query</span>
+<span class="k">fields</span>:
+  <span class="k">patient_name</span>: <span class="v">string</span>
+  <span class="k">visit_date</span>: <span class="v">date</span>
+  <span class="k">diagnosis</span>: <span class="v">string</span>
+  <span class="k">prescribed</span>: <span class="v">string</span>
+  <span class="k">followup_days</span>: <span class="v">number</span>`,
+        cols: ['patient', 'date', 'diagnosis', 'rx', 'followup'],
+        rows: [
+          ['M. Alvarez',  '2026-02-14', 'Type 2 diabetes',     'Metformin 500mg', '30'],
+          ['J. Park',     '2026-02-14', 'Hypertension',        'Lisinopril 10mg', '14'],
+          ['R. Okafor',   '2026-02-15', 'Acute bronchitis',    'Azithromycin',    '7']
+        ]
+      },
+      budget: {
+        schema:
+`<span class="c"># city_budget.yaml</span>
+<span class="k">name</span>: <span class="v">BudgetLine</span>
+<span class="k">mode</span>: <span class="v">table</span>
+<span class="k">header_pages</span>: <span class="v">1</span>
+<span class="k">fields</span>:
+  <span class="k">department</span>: <span class="v">string</span>
+  <span class="k">line_item</span>: <span class="v">string</span>
+  <span class="k">fy_2025</span>: <span class="v">number</span>
+  <span class="k">fy_2026</span>: <span class="v">number</span>`,
+        cols: ['dept', 'line item', 'fy25', 'fy26'],
+        rows: [
+          ['Public Works', 'Street resurfacing',   '4,210,000', '4,520,000'],
+          ['Public Works', 'Snow &amp; ice',           '1,180,000', '1,240,000'],
+          ['Parks',        'Recreation programs',  '780,500',   '812,000'],
+          ['Fire',         'Apparatus replacement','2,300,000', '2,500,000']
+        ]
+      },
+      disclosure: {
+        schema:
+`<span class="c"># ptr.yaml — congressional trades</span>
+<span class="k">name</span>: <span class="v">PTR</span>
+<span class="k">mode</span>: <span class="v">table</span>
+<span class="k">fields</span>:
+  <span class="k">filer</span>: <span class="v">string</span>
+  <span class="k">ticker</span>: <span class="v">string</span>
+  <span class="k">action</span>:
+    <span class="k">type</span>: <span class="v">category</span>
+    <span class="k">values</span>: [<span class="v">Buy</span>, <span class="v">Sell</span>]
+  <span class="k">amount</span>: <span class="v">string</span>
+  <span class="k">trade_date</span>: <span class="v">date</span>`,
+        cols: ['filer', 'ticker', 'action', 'amount', 'date'],
+        rows: [
+          ['Rep. Henley',  'NVDA', 'Buy',  '$15,001–$50,000',   '2026-01-09'],
+          ['Rep. Henley',  'MSFT', 'Sell', '$50,001–$100,000',  '2026-01-09'],
+          ['Sen. Whitman', 'TSLA', 'Buy',  '$1,001–$15,000',    '2026-01-12'],
+          ['Sen. Whitman', 'AAPL', 'Sell', '$100,001–$250,000', '2026-01-13']
+        ]
+      }
+    };
+
+    const keys = ['clinical', 'budget', 'disclosure'];
+
+    function renderTable(doc) {
+      let html = '<table><thead><tr>';
+      doc.cols.forEach(c => html += `<th>${c}</th>`);
+      html += '</tr></thead><tbody>';
+      doc.rows.forEach(r => {
+        html += '<tr>';
+        r.forEach(cell => html += `<td>${cell}</td>`);
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+
+    // ── Main demo slider ─────────────────
+    const dTrack = document.getElementById('demo-track');
+    const dThumb = document.getElementById('demo-thumb');
+    const dSeg1 = document.getElementById('seg1');
+    const dSeg2 = document.getElementById('seg2');
+    const dSeg3 = document.getElementById('seg3');
+    const dLabels = document.querySelectorAll('.demo-slider-label');
+    const dSchema = document.getElementById('demo-schema');
+    const dOutput = document.getElementById('demo-output');
+    const dPositions = [0, 50, 100];
+
+    function setDemo(idx, animate) {
+      dThumb.style.transition = animate === false ? 'none' : 'left 0.25s ease';
+      dThumb.style.left = dPositions[idx] + '%';
+      dSeg1.classList.toggle('lit', idx >= 1);
+      dSeg2.classList.toggle('lit', idx >= 1);
+      dSeg3.classList.toggle('lit', idx >= 2);
+      dLabels.forEach((l, i) => l.classList.toggle('active', i === idx));
+      const doc = docs[keys[idx]];
+      dSchema.innerHTML = doc.schema;
+      dOutput.innerHTML = renderTable(doc);
+    }
+
+    function demoPosToIdx(clientX) {
+      const rect = dTrack.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      return Math.round(pct * 2);
+    }
+
+    dTrack.addEventListener('click', e => setDemo(demoPosToIdx(e.clientX)));
+
+    let dragging = false;
+    dThumb.style.pointerEvents = 'auto';
+    dThumb.addEventListener('mousedown', e => { dragging = true; e.preventDefault(); });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      setDemo(demoPosToIdx(e.clientX), false);
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+
+    dThumb.addEventListener('touchstart', e => { dragging = true; e.preventDefault(); }, { passive: false });
+    document.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      setDemo(demoPosToIdx(e.touches[0].clientX), false);
+    }, { passive: true });
+    document.addEventListener('touchend', () => { dragging = false; });
+
+    dLabels.forEach(l => l.addEventListener('click', () => setDemo(parseInt(l.dataset.idx))));
+
+    setDemo(0);
+
+    // ── Hero demo (autoplay) ─────────────
+    const hdThumb = document.getElementById('hd-thumb');
+    const hdSeg1 = document.getElementById('hd-seg1');
+    const hdSeg2 = document.getElementById('hd-seg2');
+    const hdSeg3 = document.getElementById('hd-seg3');
+    const hdLabels = document.querySelectorAll('.hd-slider-label');
+    const hdSchema = document.getElementById('hd-schema');
+    const hdOutput = document.getElementById('hd-output');
+    const hdPositions = [0, 50, 100];
+
+    function setHero(idx) {
+      hdThumb.style.left = hdPositions[idx] + '%';
+      hdSeg1.classList.toggle('lit', idx >= 1);
+      hdSeg2.classList.toggle('lit', idx >= 1);
+      hdSeg3.classList.toggle('lit', idx >= 2);
+      hdLabels.forEach((l, i) => l.classList.toggle('active', i === idx));
+      const doc = docs[keys[idx]];
+      hdSchema.innerHTML = doc.schema;
+      // Compact output for hero — first 2 rows, fewer cols
+      const cols = doc.cols.slice(0, 3);
+      const rows = doc.rows.slice(0, 2).map(r => r.slice(0, 3));
+      let html = '<table class="hd-table"><thead><tr>';
+      cols.forEach(c => html += `<th>${c}</th>`);
+      html += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        html += '<tr>';
+        r.forEach(cell => html += `<td>${cell}</td>`);
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      hdOutput.innerHTML = html;
+    }
+
+    let hdIdx = 0;
+    setHero(0);
+    setInterval(() => {
+      hdIdx = (hdIdx + 1) % 3;
+      setHero(hdIdx);
+    }, 3200);
+
+    // ── Scroll fade-in ───────────────────
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
