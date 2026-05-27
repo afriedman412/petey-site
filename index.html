@@ -1739,37 +1739,23 @@
     </div>
   </section>
 
-  <!-- MODES -->
+  <!-- APP -->
   <section class="modes-section">
     <div class="modes-inner">
-      <div class="section-label fade-in">Two surfaces</div>
-      <h2 class="section-headline fade-in">An app for most.<br>A <em>serious tool</em> for the rest.</h2>
-      <div class="modes-grid">
-        <div class="mode-card fade-in">
-          <div class="mode-icon">⇲</div>
-          <div class="mode-name">Desktop app</div>
-          <div class="mode-tagline">The main way most people use Petey.</div>
-          <div class="mode-pills">
-            <div class="mode-pill">Mac &amp; Windows, drag-and-drop</div>
-            <div class="mode-pill">No coding required</div>
-            <div class="mode-pill">Build and tune blueprints in the UI</div>
-            <div class="mode-pill">Drop in a folder, get a spreadsheet</div>
-          </div>
-          <a href="/download" class="mode-link">Download →</a>
-          <div class="mode-sub-link"><a href="https://petey.cc">or try in browser</a></div>
-        </div>
-        <div class="mode-card fade-in">
-          <div class="mode-icon">{ }</div>
-          <div class="mode-name">Python package</div>
-          <div class="mode-tagline">A full ML-ops surface for engineers and data teams.</div>
-          <div class="mode-pills">
-            <div class="mode-pill">Plug into RAG — pass retrieved text straight to the extractor</div>
-            <div class="mode-pill">Batch jobs from a Makefile, CI, or scheduler</div>
-            <div class="mode-pill">Swap parsers and LLMs per-run; register new ones in YAML</div>
-            <div class="mode-pill">Programmatic API + a robust CLI</div>
-          </div>
-          <a href="https://github.com/afriedman412/petey" class="mode-link">View on GitHub →</a>
-        </div>
+      <div class="section-label fade-in">The app</div>
+      <h2 class="section-headline fade-in">PDFs in.<br><em>Spreadsheets</em> out.</h2>
+      <p class="deploy-intro fade-in">
+        Petey for your desktop. Drag in a PDF or a whole folder, pick a blueprint or build your own, get back structured data ready for your spreadsheet — no setup, no terminal, no code.
+      </p>
+      <div class="mode-pills fade-in" style="max-width: 620px;">
+        <div class="mode-pill">Mac &amp; Windows, drag-and-drop</div>
+        <div class="mode-pill">Build and tune blueprints in the UI</div>
+        <div class="mode-pill">Bring your own AI keys — OpenAI, Anthropic, Google, or Ollama</div>
+        <div class="mode-pill">Or run fully local on Apple Silicon</div>
+      </div>
+      <div class="hero-actions fade-in" style="margin-top: 32px;">
+        <a href="/download" class="btn-primary">Download for Mac &amp; Windows →</a>
+        <a href="https://petey.cc" class="btn-ghost">or try in browser</a>
       </div>
     </div>
   </section>
@@ -1786,7 +1772,7 @@
         <div class="deploy-card fade-in">
           <div class="deploy-eyebrow">Local</div>
           <div class="deploy-name">On your machine</div>
-          <div class="deploy-desc">Marker, Tesseract, Ollama. Nothing leaves your laptop. Best for sensitive work and tight feedback loops while you build a blueprint.</div>
+          <div class="deploy-desc">PyMuPDF, Tesseract, Ollama. Nothing leaves your laptop. Best for sensitive work and tight feedback loops while you build a blueprint.</div>
           <div class="deploy-code">$ petey extract docs/ --blueprint my.bpt</div>
         </div>
         <div class="deploy-card fade-in">
@@ -1867,7 +1853,7 @@ results = <span class="fn">extract</span>(
         <div class="privacy-tier">
           <div class="privacy-tier-marker"><span>Tier 03</span><span class="status">fully local mode</span></div>
           <div class="privacy-tier-claim">Your documents never touch any external service.</div>
-          <div class="privacy-tier-detail">Pair local parsers (Marker, Tesseract) with a local LLM (Ollama, MLX). Available today for digital PDFs on Apple Silicon; expanding as small local models improve.</div>
+          <div class="privacy-tier-detail">Pair local parsers (PyMuPDF, Tesseract) with a local LLM (Ollama, MLX). Available today for digital PDFs on Apple Silicon; expanding as small local models improve.</div>
         </div>
       </div>
       <ul class="security-list fade-in">
