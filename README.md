@@ -2,7 +2,7 @@
 
 Informational landing site for [Petey](https://petey.cc). Static HTML, no build step.
 
-The desktop app is the canonical product the site sells. The hosted petey-web is a try-it-now demo, not a parallel product — secondary CTA only. The Python package is a credibility surface for engineers.
+The desktop app is the canonical product the site sells. The hosted petey-app (formerly petey-web) is a try-it-now demo, not a parallel product — secondary CTA only. The Python package is a credibility surface for engineers.
 
 ## Local preview
 
@@ -21,6 +21,6 @@ Blueprint library (`/library` + `/library/{format}`) is planned but not built ye
 
 ## Notes
 
-- Download buttons in `/download/` point at `https://github.com/afriedman412/petey-web/releases/latest`. Verify this matches the desktop release URL once the next release lands.
+- Download buttons in `/download/` point at `https://github.com/afriedman412/petey-app/releases/latest`. The latest tag resolves automatically when new desktop-v* tags ship.
 - The hero CTA on the homepage and the nav CTA both point at `/download`.
-- The hosted petey-web is linked as "Try in browser" — secondary CTA — and is expected to live at `app.petey.cc` once migrated off the apex.
+- The hosted petey-app is linked as "Try in browser" — secondary CTA — and lives at `app.petey.cc` (migration off the apex completed 2026-05-28).
