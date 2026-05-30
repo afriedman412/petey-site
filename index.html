@@ -417,42 +417,42 @@
     .hd-table tr:last-child td { border-bottom: none; }
 
     /* ── FEATURE STRIP ───────────────────── */
-    .features-strip {
+    /* ── THE BASICS ──────────────────────── */
+    .basics-section {
       background: var(--panel);
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
-      padding: 36px 40px;
-      display: flex;
-      justify-content: center;
-      gap: 0;
+      padding: 72px 40px;
+      text-align: center;
     }
 
-    .feature-item {
-      flex: 1;
-      max-width: 330px;
-      padding: 0 40px;
-      border-right: 1px solid var(--line);
+    .basics-inner {
+      max-width: 760px;
+      margin: 0 auto;
     }
 
-    .feature-item:last-child { border-right: none; }
-    .feature-item:first-child { padding-left: 0; }
-
-    .feature-title {
+    .basics-headline {
       font-family: var(--serif);
-      font-variation-settings: 'opsz' 72;
-      font-size: 22px;
-      font-weight: 500;
+      font-variation-settings: 'opsz' 144;
+      font-size: clamp(28px, 3.6vw, 40px);
+      font-weight: 400;
       color: var(--ink);
-      margin-bottom: 8px;
-      letter-spacing: -0.01em;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin: 14px 0 18px;
     }
 
-    .feature-title .accent { color: var(--orange); }
+    .basics-headline em {
+      font-style: italic;
+      font-variation-settings: 'opsz' 144, 'SOFT' 50;
+    }
 
-    .feature-desc {
-      font-size: 14.5px;
+    .basics-sub {
+      font-size: 16.5px;
       color: var(--ink-mid);
       line-height: 1.6;
+      max-width: 560px;
+      margin: 0 auto;
     }
 
     /* ── SECTION SHARED ──────────────────── */
@@ -1073,6 +1073,7 @@
     .dev-section {
       padding: 80px 40px;
       background: var(--bg);
+      border-top: 1px solid var(--line);
     }
 
     .dev-inner {
@@ -1191,7 +1192,7 @@
     /* ── PRODUCT / CORE+CUSTOM ───────────── */
     .product-section {
       padding: 80px 40px;
-      background: var(--panel);
+      background: var(--bg);
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
     }
@@ -1207,7 +1208,7 @@
     }
 
     .product-band {
-      background: #fff;
+      background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 12px;
       padding: 28px;
@@ -1247,9 +1248,9 @@
 
     .pipeline {
       display: flex;
-      align-items: stretch;
-      gap: 4px;
-      overflow-x: auto;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 8px 0;
     }
 
     .pipeline-step {
@@ -1257,45 +1258,99 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
+      text-align: center;
     }
 
     .pipeline-step-box {
-      background: var(--panel);
+      background: #fff;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 16px 12px;
-      text-align: center;
+      border-radius: 10px;
+      padding: 22px 14px;
       font-family: var(--serif);
       font-variation-settings: 'opsz' 72;
-      font-size: 17px;
+      font-size: 20px;
       font-weight: 500;
       color: var(--ink);
       letter-spacing: -0.01em;
     }
 
-    .product-band.custom .pipeline-step-box {
-      background: #fff;
-      border-style: dashed;
-    }
-
     .pipeline-step-examples {
-      font-size: 11.5px;
+      font-size: 12.5px;
       color: var(--ink-light);
-      text-align: center;
-      line-height: 1.5;
-      padding: 0 4px;
+      line-height: 1.55;
+      padding: 0 6px;
     }
 
     .pipeline-arrow {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--mono);
-      font-size: 14px;
-      color: var(--ink-light);
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--orange);
       padding-top: 18px;
-      min-width: 18px;
+      min-width: 22px;
+    }
+
+    /* ── MODULES GRID ─────────────────────── */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .module-card {
+      background: var(--panel-2);
+      border: 1px dashed var(--ink-light);
+      border-radius: 10px;
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .module-card-eyebrow {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    .module-card-name {
+      font-family: var(--serif);
+      font-variation-settings: 'opsz' 72;
+      font-size: 19px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .module-card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .module-card-list li {
+      font-size: 13.5px;
+      color: var(--ink-mid);
+      line-height: 1.45;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+    }
+
+    .module-card-list li::before {
+      content: "—";
+      color: var(--ink-light);
+      flex-shrink: 0;
     }
 
     .product-footer {
@@ -1324,6 +1379,54 @@
     }
 
     .product-footer-link:hover {
+      color: var(--orange);
+      border-color: var(--orange);
+    }
+
+    /* ── REQUEST / ON-REQUEST ─────────────── */
+    .request-section {
+      padding: 80px 40px;
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .request-inner { max-width: 1100px; margin: 0 auto; }
+
+    .request-intro {
+      font-size: 16px;
+      color: var(--ink-mid);
+      max-width: 680px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    .request-footer {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .request-footer-text {
+      font-size: 15px;
+      color: var(--ink-mid);
+      line-height: 1.55;
+      max-width: 620px;
+      margin: 0 auto 14px;
+    }
+
+    .request-footer-link {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 1px;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .request-footer-link:hover {
       color: var(--orange);
       border-color: var(--orange);
     }
@@ -1458,6 +1561,7 @@
     /* ── SECURITY ────────────────────────── */
     .security-section {
       background: var(--bg);
+      border-top: 1px solid var(--line);
       padding: 72px 40px;
     }
 
@@ -1632,18 +1736,48 @@
     /* ── FOOTER ──────────────────────────── */
     footer {
       background: var(--ink);
-      padding: 40px 40px;
+      padding: 56px 40px 32px;
       color: rgba(255,255,255,0.55);
     }
 
-    .footer-inner {
-      max-width: 1100px;
-      margin: 0 auto;
+    .footer-inner { max-width: 1100px; margin: 0 auto; }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 24px;
+    }
+
+    .footer-col-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 14px;
+    }
+
+    .footer-col a {
+      display: block;
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      line-height: 2;
+      transition: color 0.15s ease;
+    }
+
+    .footer-col a:hover { color: var(--orange); }
+
+    .footer-bottom {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 16px;
     }
 
     .footer-logo {
@@ -1657,21 +1791,24 @@
 
     .footer-logo .dot { color: var(--orange); }
 
-    .footer-links {
+    .footer-meta {
       display: flex;
+      align-items: center;
       gap: 24px;
-      font-size: 13px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,0.45);
+      flex-wrap: wrap;
     }
 
-    .footer-links a {
-      color: rgba(255,255,255,0.6);
+    .footer-meta a {
+      color: rgba(255,255,255,0.5);
       text-decoration: none;
       transition: color 0.15s ease;
     }
 
-    .footer-links a:hover { color: #fff; }
+    .footer-meta a:hover { color: var(--orange); }
 
-    .footer-note { font-size: 13px; font-style: italic; }
+    .footer-note { font-style: italic; color: rgba(255,255,255,0.45); }
 
     /* ── ANIMATIONS ──────────────────────── */
     @keyframes fadeUp {
@@ -1698,9 +1835,7 @@
       .hamburger { display: flex; }
       .hero { grid-template-columns: 1fr; padding: 90px 24px 40px; gap: 36px; max-width: none; }
       .hero-right { display: none; }
-      .features-strip { flex-direction: column; padding: 36px 20px; gap: 24px; }
-      .feature-item { border-right: none; border-bottom: 1px solid var(--line); padding: 0 0 24px; max-width: none; }
-      .feature-item:last-child { border-bottom: none; }
+      .basics-section { padding: 48px 20px; }
       .demo-wrapper { grid-template-columns: 1fr; }
       .doc-tabs { display: flex; flex-wrap: wrap; }
       .stage-tabs { grid-template-columns: 1fr; }
@@ -1710,12 +1845,15 @@
       .deploy-grid { grid-template-columns: 1fr; }
       .dev-inner { grid-template-columns: 1fr; gap: 36px; }
       .pricing-grid { grid-template-columns: 1fr; }
-      .pipeline { flex-direction: column; gap: 4px; }
+      .pipeline { flex-direction: column; gap: 8px; }
       .pipeline-arrow { padding-top: 0; transform: rotate(90deg); align-self: center; }
-      .demo-section, .how-section, .modes-section, .deploy-section, .dev-section, .product-section, .pricing-section, .about-section { padding: 56px 20px; }
+      .modules-grid { grid-template-columns: 1fr 1fr; }
+      .demo-section, .how-section, .modes-section, .deploy-section, .dev-section, .product-section, .request-section, .pricing-section, .about-section { padding: 56px 20px; }
       .security-section { padding: 48px 20px; }
       .pricing-card { padding: 28px; }
-      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .footer-meta { gap: 14px; }
     }
   </style>
 </head>
@@ -1726,8 +1864,8 @@
     <a href="#" class="nav-logo">Petey<span class="dot">.</span></a>
     <div class="nav-right">
       <div class="nav-links">
-        <a href="#demo" class="nav-link">Blueprints</a>
-        <a href="#product" class="nav-link">The product</a>
+        <a href="#pipeline" class="nav-link">The pipeline</a>
+        <a href="#on-request" class="nav-link">On request</a>
         <a href="#privacy" class="nav-link">Privacy</a>
       </div>
       <a href="/download" class="nav-cta">Download →</a>
@@ -1738,8 +1876,8 @@
   </nav>
 
   <div class="mobile-menu" id="mobile-menu">
-    <a href="#demo" onclick="closeMobileMenu()">Blueprints</a>
-    <a href="#product" onclick="closeMobileMenu()">The product</a>
+    <a href="#pipeline" onclick="closeMobileMenu()">The pipeline</a>
+    <a href="#on-request" onclick="closeMobileMenu()">On request</a>
     <a href="#privacy" onclick="closeMobileMenu()">Privacy</a>
     <a href="/download">Download →</a>
   </div>
@@ -1753,115 +1891,41 @@
         Your data <em>out</em><span class="dot">.</span>
       </h1>
       <p class="hero-sub">
-        Petey turns PDFs into structured data. Drop one in, get a row out. Drop a thousand in, get a table. No code required. Runs on your laptop, in your cloud, or inside your VPC.
+        Petey turns PDFs into structured data. Drop one in, get a row out. Drop a thousand in, get a table. No code. No upload.
       </p>
       <div class="hero-actions">
         <a href="/download" class="btn-primary">Download for Mac &amp; Windows →</a>
         <a href="https://app.petey.cc" class="btn-ghost">Try in browser</a>
       </div>
-      <p class="hero-note">Open source. Apache 2.0. Runs on your laptop.</p>
     </div>
   </section>
 
-  <!-- FEATURE STRIP -->
-  <div class="features-strip">
-    <div class="feature-item">
-      <div class="feature-title">You define the <span class="accent">output</span></div>
-      <div class="feature-desc">Tell Petey what fields you want; it returns that — nothing more, nothing less. Predictable, repeatable, auditable.</div>
-    </div>
-    <div class="feature-item">
-      <div class="feature-title">Runs <span class="accent">anywhere</span></div>
-      <div class="feature-desc">Your laptop, your cloud, your VPC. Local extraction works on consumer hardware.</div>
-    </div>
-    <div class="feature-item">
-      <div class="feature-title">Works with <span class="accent">everything</span></div>
-      <div class="feature-desc">OpenAI, Anthropic, Google, or fully local — use whatever AI service you already trust.</div>
-    </div>
-  </div>
-
-  <!-- DEMO -->
-  <section class="demo-section" id="demo">
-    <div class="section-label fade-in">Product</div>
-    <h2 class="section-headline fade-in">Define what you want.<br>Get <em>exactly</em> that.</h2>
-
-    <p class="demo-intro fade-in">
-      A blueprint is a short, plain-text description of the fields you want — a name, a type, a one-line explanation each. It pins down the shape of the output, takes the guesswork out of the model, and turns extraction from a one-off into a recipe you can reuse, version, and share.
-    </p>
-
-    <div class="doc-tabs fade-in" id="doc-tabs">
-      <button class="doc-tab active" data-doc="clinical">Clinical record</button>
-      <button class="doc-tab" data-doc="budget">City budget</button>
-      <button class="doc-tab" data-doc="disclosure">Stock disclosure</button>
-    </div>
-
-    <div class="stage fade-in">
-      <div class="stage-tabs" id="stage-tabs">
-        <button class="stage-tab active" data-view="input">
-          <span class="ico">PDF</span>
-          <span class="col">
-            <span class="role">Input</span>
-            <span class="kind">the document</span>
-          </span>
-          <span class="more">›</span>
-        </button>
-        <button class="stage-tab" data-view="schema">
-          <span class="ico">{ }</span>
-          <span class="col">
-            <span class="role">Blueprint</span>
-            <span class="kind">what to extract</span>
-          </span>
-          <span class="more">›</span>
-        </button>
-        <button class="stage-tab" data-view="output">
-          <span class="ico">≡</span>
-          <span class="col">
-            <span class="role">Output</span>
-            <span class="kind">what you get</span>
-          </span>
-          <span class="more">›</span>
-        </button>
-      </div>
-      <div class="stage-frame">
-        <div class="stage-pane" id="stage-pane"></div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- APP -->
-  <section class="modes-section">
-    <div class="modes-inner">
-      <div class="section-label fade-in">The app</div>
-      <h2 class="section-headline fade-in">PDFs in.<br><em>Spreadsheets</em> out.</h2>
-      <p class="deploy-intro fade-in">
-        Petey for your desktop. Drag in a PDF or a whole folder, pick a blueprint or build your own, get back structured data ready for your spreadsheet — no setup, no terminal, no code.
+  <!-- THE BASICS -->
+  <section class="basics-section" id="basics">
+    <div class="basics-inner">
+      <div class="section-label fade-in">The basics</div>
+      <h2 class="basics-headline fade-in">
+        A desktop app for a <em>common problem</em>.
+      </h2>
+      <p class="basics-sub fade-in">
+        PDF data extraction is everywhere — and easier to solve than most people think. The pieces (parsers, AI models, structured outputs) have existed for years; getting them to work together is the hard part. Petey is the desktop app that does the wiring, striking a balance between sophistication and accessibility.
       </p>
-      <div class="mode-pills fade-in" style="max-width: 620px;">
-        <div class="mode-pill">Mac &amp; Windows, drag-and-drop</div>
-        <div class="mode-pill">Build and tune blueprints in the UI</div>
-        <div class="mode-pill">Bring your own AI keys — OpenAI, Anthropic, Google, or Ollama</div>
-        <div class="mode-pill">Or run fully local on Apple Silicon</div>
-      </div>
-      <div class="hero-actions fade-in" style="margin-top: 32px;">
-        <a href="/download" class="btn-primary">Download for Mac &amp; Windows →</a>
-        <a href="https://app.petey.cc" class="btn-ghost">or try in browser</a>
-      </div>
     </div>
   </section>
 
-  <!-- PRODUCT: CORE + CUSTOM -->
-  <section class="product-section" id="product">
+  <!-- THE PIPELINE (core only) -->
+  <section class="product-section" id="pipeline">
     <div class="product-inner">
-      <div class="section-label fade-in">The product</div>
-      <h2 class="section-headline fade-in">What ships. <em>What we'll build with you.</em></h2>
+      <div class="section-label fade-in">The pipeline</div>
+      <h2 class="section-headline fade-in">Four steps. <em>Same every time.</em></h2>
       <p class="product-intro fade-in">
-        The open-source app is the whole product. Everything below the line — sources, evaluation, destinations — we'll build with you when there's specific demand. Not a premium tier. Just where we prioritize next.
+        Under the hood, the same four-step pipeline runs everywhere — desktop app, web app, Docker container, Python library. Pluggable parsers, pluggable LLMs. Same blueprints, same outputs. Open source, AGPL, free.
       </p>
 
       <div class="product-band fade-in">
         <div class="product-band-header">
-          <span class="product-band-eyebrow">Open source · Apache 2.0</span>
-          <span class="product-band-note">In the package. Free. Audit it. Fork it.</span>
+          <span class="product-band-eyebrow">Open source · AGPL</span>
+          <span class="product-band-note">In the package. Audit it. Fork it.</span>
         </div>
         <div class="pipeline">
           <div class="pipeline-step">
@@ -1870,60 +1934,79 @@
           </div>
           <div class="pipeline-arrow">→</div>
           <div class="pipeline-step">
-            <div class="pipeline-step-box">Parser</div>
-            <div class="pipeline-step-examples">PyMuPDF, Marker, Tesseract</div>
+            <div class="pipeline-step-box">Parse</div>
+            <div class="pipeline-step-examples">PyMuPDF, Marker, Tesseract, Datalab, 10+ more</div>
           </div>
           <div class="pipeline-arrow">→</div>
           <div class="pipeline-step">
-            <div class="pipeline-step-box">LLM</div>
+            <div class="pipeline-step-box">Comprehend</div>
             <div class="pipeline-step-examples">OpenAI, Anthropic, Google, Ollama</div>
           </div>
           <div class="pipeline-arrow">→</div>
           <div class="pipeline-step">
-            <div class="pipeline-step-box">CSV / JSON</div>
-            <div class="pipeline-step-examples">to your filesystem</div>
+            <div class="pipeline-step-box">Export</div>
+            <div class="pipeline-step-examples">CSV / JSON to your filesystem</div>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="product-band custom fade-in">
-        <div class="product-band-header">
-          <span class="product-band-eyebrow">On request · custom build</span>
-          <span class="product-band-note">Logistical, not protected. Things we'll prioritize when there's demand.</span>
+  <!-- AVAILABLE ON REQUEST -->
+  <section class="request-section" id="on-request">
+    <div class="request-inner">
+      <div class="section-label fade-in">Available on request</div>
+      <h2 class="section-headline fade-in">Need something extra? <em>We'll build it with you.</em></h2>
+      <p class="request-intro fade-in">
+        Sources, evaluation, destinations, custom blueprints, on-prem help. We'll prioritize building what a customer actually needs. Same AGPL license; once it's built, it's in the package for everyone.
+      </p>
+      <div class="modules-grid">
+        <div class="module-card">
+          <div class="module-card-eyebrow">Sources</div>
+          <div class="module-card-name">Where the PDFs come from</div>
+          <ul class="module-card-list">
+            <li>SharePoint</li>
+            <li>OneDrive</li>
+            <li>S3 / Drive</li>
+            <li>Watch folders</li>
+            <li>Email inbox</li>
+          </ul>
         </div>
-        <div class="pipeline">
-          <div class="pipeline-step">
-            <div class="pipeline-step-box">Sources</div>
-            <div class="pipeline-step-examples">SharePoint, S3, Drive, watch folders, email inbox</div>
-          </div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step">
-            <div class="pipeline-step-box">Parser</div>
-            <div class="pipeline-step-examples">specialized backends, fine-tuned routing</div>
-          </div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step">
-            <div class="pipeline-step-box">LLM</div>
-            <div class="pipeline-step-examples">private models, tuned prompting</div>
-          </div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step">
-            <div class="pipeline-step-box">Eval</div>
-            <div class="pipeline-step-examples">per-field confidence, review workflows</div>
-          </div>
-          <div class="pipeline-arrow">→</div>
-          <div class="pipeline-step">
-            <div class="pipeline-step-box">Destinations</div>
-            <div class="pipeline-step-examples">database, webhook, API, streaming</div>
-          </div>
+        <div class="module-card">
+          <div class="module-card-eyebrow">Evaluation</div>
+          <div class="module-card-name">Trust the output</div>
+          <ul class="module-card-list">
+            <li>Per-field confidence scores</li>
+            <li>Review UI for flagged fields</li>
+            <li>Append-only audit log</li>
+          </ul>
+        </div>
+        <div class="module-card">
+          <div class="module-card-eyebrow">Export</div>
+          <div class="module-card-name">Where the data lands</div>
+          <ul class="module-card-list">
+            <li>Postgres, SQLite, MongoDB</li>
+            <li>Webhooks</li>
+            <li>Streaming endpoints</li>
+            <li>Custom API integrations</li>
+          </ul>
+        </div>
+        <div class="module-card">
+          <div class="module-card-eyebrow">Blueprints &amp; deploy</div>
+          <div class="module-card-name">Built around your work</div>
+          <ul class="module-card-list">
+            <li>Custom blueprints for your doc types</li>
+            <li>On-prem deployment assist</li>
+            <li>VPC / regulated-environment setup</li>
+          </ul>
         </div>
       </div>
 
-      <div class="product-footer fade-in">
-        <p class="product-footer-text">
-          These pieces aren't held back from anyone. They're things we'll prioritize building sooner if there's a real need for them. Eventually most of it ends up in the core package anyway. Have something in mind?
+      <div class="request-footer fade-in">
+        <p class="request-footer-text">
+          Have something in mind?
         </p>
-        <a href="mailto:info@petey.cc" class="product-footer-link">info@petey.cc →</a>
+        <a href="mailto:info@petey.cc" class="request-footer-link">info@petey.cc →</a>
       </div>
     </div>
   </section>
@@ -2033,14 +2116,32 @@ results = <span class="fn">extract</span>(
   <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
-      <div class="footer-logo">Petey<span class="dot">.</span></div>
-      <div class="footer-links">
-        <a href="https://app.petey.cc">Web app</a>
-        <a href="https://github.com/afriedman412/petey">GitHub</a>
-        <a href="https://pypi.org/project/petey/">PyPI</a>
-        <a href="https://hub.docker.com/r/afriedman412/petey">Docker</a>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-col-title">Download</div>
+          <a href="/download">Desktop app</a>
+          <a href="https://hub.docker.com/r/afriedman412/petey">Docker</a>
+          <a href="https://pypi.org/project/petey/">PyPI (CLI)</a>
+          <a href="https://github.com/afriedman412/petey">GitHub</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Resources</div>
+          <a href="https://app.petey.cc">Web app</a>
+          <a href="https://app.petey.cc/demos">Demos</a>
+          <a href="https://app.petey.cc/about">About</a>
+          <a href="https://app.petey.cc/about#keys">API keys</a>
+          <a href="https://app.petey.cc/about#costs">Costs</a>
+          <a href="https://app.petey.cc/about#faq">FAQ</a>
+        </div>
       </div>
-      <div class="footer-note">Because PDFs are terrible.</div>
+      <div class="footer-bottom">
+        <div class="footer-logo">Petey<span class="dot">.</span></div>
+        <div class="footer-meta">
+          <span>Petey &copy; <span id="footer-year"></span></span>
+          <a href="https://app.petey.cc/about#legal">Disclaimers</a>
+          <span class="footer-note">Because PDFs are terrible.</span>
+        </div>
+      </div>
     </div>
   </footer>
 
@@ -2057,150 +2158,6 @@ results = <span class="fn">extract</span>(
       mobileMenu.classList.remove('open');
     }
 
-    // ── Document data ────────────────────
-    const docs = {
-      clinical: {
-        file: 'clinical.bpt',
-        image: 'static/clinical_screenshot.png',
-        schema:
-`<span class="c"># clinical_note.bpt</span>
-<span class="k">name</span>: <span class="v">ClinicalNote</span>
-<span class="k">mode</span>: <span class="v">query</span>
-<span class="k">fields</span>:
-  <span class="k">patient_name</span>: <span class="v">string</span>
-  <span class="k">visit_date</span>: <span class="v">date</span>
-  <span class="k">diagnosis</span>: <span class="v">string</span>
-  <span class="k">prescribed</span>: <span class="v">string</span>
-  <span class="k">followup_days</span>: <span class="v">number</span>`,
-        cols: ['patient', 'date', 'diagnosis', 'rx', 'followup'],
-        rows: [
-          ['M. Alvarez',  '2026-02-14', 'Type 2 diabetes',  'Metformin 500mg', '30'],
-          ['J. Park',     '2026-02-14', 'Hypertension',     'Lisinopril 10mg', '14'],
-          ['R. Okafor',   '2026-02-15', 'Acute bronchitis', 'Azithromycin',    '7']
-        ]
-      },
-      budget: {
-        file: 'budget.bpt',
-        image: 'static/des_moines_screenshot.png',
-        schema:
-`<span class="c"># city_budget.bpt</span>
-<span class="k">name</span>: <span class="v">BudgetLine</span>
-<span class="k">mode</span>: <span class="v">table</span>
-<span class="k">header_pages</span>: <span class="v">1</span>
-<span class="k">fields</span>:
-  <span class="k">department</span>: <span class="v">string</span>
-  <span class="k">line_item</span>: <span class="v">string</span>
-  <span class="k">fy_2025</span>: <span class="v">number</span>
-  <span class="k">fy_2026</span>: <span class="v">number</span>`,
-        cols: ['dept', 'line item', 'fy25', 'fy26'],
-        rows: [
-          ['Public Works', 'Street resurfacing',    '4,210,000', '4,520,000'],
-          ['Public Works', 'Snow &amp; ice',            '1,180,000', '1,240,000'],
-          ['Parks',        'Recreation programs',   '780,500',   '812,000'],
-          ['Fire',         'Apparatus replacement', '2,300,000', '2,500,000']
-        ]
-      },
-      disclosure: {
-        file: 'ptr.bpt',
-        image: 'static/ptr_screenshot.png',
-        schema:
-`<span class="c"># ptr.bpt — congressional trades</span>
-<span class="k">name</span>: <span class="v">PTR</span>
-<span class="k">mode</span>: <span class="v">table</span>
-<span class="k">fields</span>:
-  <span class="k">filer</span>: <span class="v">string</span>
-  <span class="k">ticker</span>: <span class="v">string</span>
-  <span class="k">action</span>:
-    <span class="k">type</span>: <span class="v">category</span>
-    <span class="k">values</span>: [<span class="v">Buy</span>, <span class="v">Sell</span>]
-  <span class="k">amount</span>: <span class="v">string</span>
-  <span class="k">trade_date</span>: <span class="v">date</span>`,
-        cols: ['filer', 'ticker', 'action', 'amount', 'date'],
-        rows: [
-          ['Rep. Henley',  'NVDA', 'Buy',  '$15,001–$50,000',   '2026-01-09'],
-          ['Rep. Henley',  'MSFT', 'Sell', '$50,001–$100,000',  '2026-01-09'],
-          ['Sen. Whitman', 'TSLA', 'Buy',  '$1,001–$15,000',    '2026-01-12'],
-          ['Sen. Whitman', 'AAPL', 'Sell', '$100,001–$250,000', '2026-01-13']
-        ]
-      }
-    };
-
-    const keys = ['clinical', 'budget', 'disclosure'];
-
-    function renderTable(doc) {
-      let html = '<table><thead><tr>';
-      doc.cols.forEach(c => html += `<th>${c}</th>`);
-      html += '</tr></thead><tbody>';
-      doc.rows.forEach(r => {
-        html += '<tr>';
-        r.forEach(cell => html += `<td>${cell}</td>`);
-        html += '</tr>';
-      });
-      html += '</tbody></table>';
-      return html;
-    }
-
-    function renderHeroTable(doc) {
-      const cols = doc.cols.slice(0, 3);
-      const rows = doc.rows.slice(0, 2).map(r => r.slice(0, 3));
-      let html = '<table class="hd-table"><thead><tr>';
-      cols.forEach(c => html += `<th>${c}</th>`);
-      html += '</tr></thead><tbody>';
-      rows.forEach(r => {
-        html += '<tr>';
-        r.forEach(cell => html += `<td>${cell}</td>`);
-        html += '</tr>';
-      });
-      html += '</tbody></table>';
-      return html;
-    }
-
-    // ── Demo: doc selector + 3-view stage ─
-    const docTabs = document.querySelectorAll('#doc-tabs .doc-tab');
-    const stageTabs = document.querySelectorAll('#stage-tabs .stage-tab');
-    const stagePane = document.getElementById('stage-pane');
-
-    let currentDoc = 'clinical';
-    let currentView = 'input';
-
-    function renderStage(animate) {
-      const doc = docs[currentDoc];
-      const paint = () => {
-        let html = '';
-        if (currentView === 'input') {
-          html = `<div class="pane-input"><img src="${doc.image}" alt="${currentDoc} document preview" loading="lazy"></div>`;
-        } else if (currentView === 'schema') {
-          html = `<div class="pane-schema">${doc.schema}</div>`;
-        } else {
-          html = `<div class="pane-output">${renderTable(doc)}</div>`;
-        }
-        stagePane.innerHTML = html;
-        stageTabs.forEach(t => t.classList.toggle('active', t.dataset.view === currentView));
-        docTabs.forEach(t => t.classList.toggle('active', t.dataset.doc === currentDoc));
-      };
-      if (animate === false) {
-        paint();
-      } else {
-        stagePane.classList.add('fading');
-        setTimeout(() => {
-          paint();
-          stagePane.classList.remove('fading');
-        }, 180);
-      }
-    }
-
-    stageTabs.forEach(t => t.addEventListener('click', () => {
-      currentView = t.dataset.view;
-      renderStage();
-    }));
-
-    docTabs.forEach(t => t.addEventListener('click', () => {
-      currentDoc = t.dataset.doc;
-      renderStage();
-    }));
-
-    renderStage(false);
-
     // ── Scroll fade-in ───────────────────
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
@@ -2212,6 +2169,10 @@ results = <span class="fn">extract</span>(
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ── Footer year ─────────────────────
+    const yearEl = document.getElementById('footer-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
