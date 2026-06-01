@@ -1845,8 +1845,10 @@
       .deploy-grid { grid-template-columns: 1fr; }
       .dev-inner { grid-template-columns: 1fr; gap: 36px; }
       .pricing-grid { grid-template-columns: 1fr; }
-      .pipeline { flex-direction: column; gap: 8px; }
-      .pipeline-arrow { padding-top: 0; transform: rotate(90deg); align-self: center; }
+      .pipeline { flex-direction: column; gap: 8px; align-items: center; }
+      .pipeline-step { flex: 0 0 auto; width: 100%; max-width: 320px; align-items: center; }
+      .pipeline-step-box { width: 100%; }
+      .pipeline-arrow { padding-top: 0; transform: rotate(90deg); align-self: center; min-width: 0; }
       .modules-grid { grid-template-columns: 1fr 1fr; }
       .demo-section, .how-section, .modes-section, .deploy-section, .dev-section, .product-section, .request-section, .pricing-section, .about-section { padding: 56px 20px; }
       .security-section { padding: 48px 20px; }
