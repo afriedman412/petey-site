@@ -12,27 +12,28 @@ separate from petey-2.
 
 ## Deploy
 
-petey.cc is served by Netlify. From this directory, with the Netlify CLI logged in and linked to the petey.cc site:
+petey.cc is served by Netlify, which builds from this repo's `main` branch and publishes `site/` (`netlify.toml`).
+Work lands on `dev`; a PR into `main` puts it live. A manual deploy from a linked checkout also works:
 
 ```sh
-npx netlify-cli deploy --prod --dir .
+npx netlify-cli deploy --prod --dir site
 ```
 
 ## Local preview
 
 ```sh
-python3 -m http.server 8000
+python3 -m http.server 8000 -d site
 # open http://localhost:8000
 ```
 
 ## Structure
 
-- `index.html`: the homepage. Nav, hero (coming soon), three steps, how it works (no LLM calls, forms
+- `site/index.html`: the homepage. Nav, hero (coming soon), three steps, how it works (no LLM calls, forms
   mapped ahead of time, no third parties, same answer every time), footer (the earlier
   site's bottom row; its link columns pointed at the old product). No contact address: petey.cc has no MX records
   (checked 2026-10-09), so info@petey.cc does not receive mail.
-- `download/index.html`: redirect to `/`.
-- `static/`: logo, favicon, OG image.
+- `site/download/index.html`: redirect to `/`.
+- `site/static/`: logo, favicon, OG image.
 
 ## Copy rules
 

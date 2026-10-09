@@ -1,0 +1,3 @@
+# Netlify publishes only the site; the README and repo files stay out of petey.cc.
+[build]
+  publish = "site"
