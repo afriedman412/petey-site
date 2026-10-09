@@ -1,26 +1,41 @@
 # petey-site
 
-Informational landing site for [Petey](https://petey.cc). Static HTML, no build step.
+Landing site for [Petey](https://petey.cc). Static HTML, no build step.
 
-The desktop app is the canonical product the site sells. The hosted petey-app (formerly petey-web) is a try-it-now demo, not a parallel product — secondary CTA only. The Python package is a credibility surface for engineers.
+As of 2026-10-09 the site is a single "coming soon" page for the forms product: drop in a filled PDF form, Petey
+recognizes it against its library of mapped forms and returns every field as structured data. It no longer links
+to the earlier product (desktop app, app.petey.cc, the PyPI package, Docker image or GitHub repo); `/download/`
+redirects to the homepage so old links land somewhere.
+
+Lives at `~/Documents/code/petey-site` (moved out of petey-master 2026-10-09; the copy there is stale). Kept
+separate from petey-2.
+
+## Deploy
+
+petey.cc is served by Netlify, which builds from this repo's `main` branch and publishes `site/` (`netlify.toml`).
+Work lands on `dev`; a PR into `main` puts it live. A manual deploy from a linked checkout also works:
+
+```sh
+npx netlify-cli deploy --prod --dir site
+```
 
 ## Local preview
 
 ```sh
-python3 -m http.server 8000
+python3 -m http.server 8000 -d site
 # open http://localhost:8000
 ```
 
 ## Structure
 
-- `index.html` — single-page homepage. Sections: nav, hero, feature strip, demo (3-blueprint toggle), how it works, modes (desktop + Python), deploy (local / container / VPC), developers (code snippet + plugins/CLI/MCP), privacy (3-tier claim block + audit bullets), footer.
-- `download/index.html` — standalone download landing. Mac + Windows buttons (link to GitHub releases), what's in the app, system requirements, alternatives (browser demo, Python package, self-host).
-- `static/` — logo, favicon, OG image, demo screenshots.
+- `site/index.html`: the homepage. Nav, hero (coming soon), three steps, how it works (no LLM calls, forms
+  mapped ahead of time, no third parties, same answer every time), footer (the earlier
+  site's bottom row; its link columns pointed at the old product). No contact address: petey.cc has no MX records
+  (checked 2026-10-09), so info@petey.cc does not receive mail.
+- `site/download/index.html`: redirect to `/`.
+- `site/static/`: logo, favicon, OG image.
 
-Blueprint library (`/library` + `/library/{format}`) is planned but not built yet; the site can launch without it.
+## Copy rules
 
-## Notes
-
-- Download buttons in `/download/` point at `https://github.com/afriedman412/petey-app/releases/latest`. The latest tag resolves automatically when new desktop-v* tags ship.
-- The hero CTA on the homepage and the nav CTA both point at `/download`.
-- The hosted petey-app is linked as "Try in browser" — secondary CTA — and lives at `app.petey.cc` (migration off the apex completed 2026-05-28).
+Say only what the product does today. No form counts, no launch dates, no privacy or hosting promises until
+those are decided. Inputs are clean digital PDFs (fillable forms and their flattened copies), not scans.

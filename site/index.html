@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Petey — Data out of filled PDF forms</title>
+  <meta name="description" content="Petey reads filled PDF forms. Drop one in; it recognizes the form and returns every field as structured data, with no LLM calls. Coming soon." />
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="icon" type="image/png" href="/static/favicon.png" />
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" />
+  <meta property="og:title" content="Petey — Data out of filled PDF forms" />
+  <meta property="og:description" content="Drop in a filled PDF form; Petey recognizes it and returns every field as structured data. Coming soon." />
+  <meta property="og:image" content="https://petey.cc/static/og-image.png" />
+  <meta property="og:url" content="https://petey.cc/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #d8572a;
+      --orange-pale: rgba(216,87,42,0.08);
+      --bg: #ffffff;
+      --panel: #f4f4f1;
+      --line: #e0dfd9;
+      --ink: #141414;
+      --ink-mid: #555550;
+      --ink-light: #93938f;
+      --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+      --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    html { background: var(--bg); }
+    body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6;
+           -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+    a { color: inherit; }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid var(--line); }
+    .logo { font-family: var(--serif); font-variation-settings: 'opsz' 144; font-size: 26px; font-weight: 500; letter-spacing: -0.01em;
+            line-height: 1; text-decoration: none; }
+    .dot { color: var(--orange); }
+
+    main { flex: 1; }
+    .hero { max-width: 860px; margin: 0 auto; padding: 120px 40px 96px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .eyebrow { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--orange);
+               padding: 5px 12px; background: var(--orange-pale); border-radius: 100px; margin-bottom: 28px; }
+    h1 { font-family: var(--serif); font-variation-settings: 'opsz' 144; font-size: clamp(42px, 6vw, 76px); font-weight: 400;
+         line-height: .98; letter-spacing: -0.025em; margin-bottom: 24px; }
+    h1 em { font-style: italic; }
+    .sub { font-size: 18px; color: var(--ink-mid); max-width: 560px; }
+
+    .steps-wrap { background: var(--panel); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .steps { max-width: 1000px; margin: 0 auto; padding: 72px 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+    .step-n { font-family: var(--serif); font-size: 15px; color: var(--orange); margin-bottom: 10px; }
+    .step h2 { font-family: var(--serif); font-variation-settings: 'opsz' 48; font-size: 24px; font-weight: 400; letter-spacing: -0.01em;
+               line-height: 1.15; margin-bottom: 10px; }
+    .step p { font-size: 15px; color: var(--ink-mid); }
+
+    .how { max-width: 1000px; margin: 0 auto; padding: 80px 40px 88px; }
+    .how-head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
+    .label { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--orange); margin-bottom: 14px; }
+    .how-head h2 { font-family: var(--serif); font-variation-settings: 'opsz' 144; font-size: clamp(30px, 3.6vw, 42px); font-weight: 400;
+                   line-height: 1.1; letter-spacing: -0.02em; }
+    .how-head h2 em { font-style: italic; }
+    .points { display: grid; grid-template-columns: repeat(2, 1fr); gap: 36px 56px; }
+    .point h3 { font-family: var(--serif); font-variation-settings: 'opsz' 48; font-size: 21px; font-weight: 400; letter-spacing: -0.01em;
+                line-height: 1.2; margin-bottom: 8px; }
+    .point p { font-size: 15px; color: var(--ink-mid); }
+    .scope { text-align: center; font-size: 15px; color: var(--ink-mid); margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); }
+
+    /* footer: the bottom row of the earlier site's footer; its link columns pointed at the old product */
+    footer { background: var(--ink); padding: 32px 40px; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-logo { font-family: var(--serif); font-variation-settings: 'opsz' 144; font-size: 22px; font-weight: 500; color: #fff; letter-spacing: -0.01em; }
+    .footer-meta { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; font-size: 12.5px; color: rgba(255,255,255,0.45); }
+    .footer-note { font-style: italic; }
+
+    @media (max-width: 760px) {
+      nav, footer { padding-left: 20px; padding-right: 20px; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .footer-meta { gap: 14px; }
+      .hero { padding: 80px 20px 64px; }
+      .sub { font-size: 16px; }
+      .steps { grid-template-columns: 1fr; gap: 32px; padding: 56px 20px; }
+      .how { padding: 56px 20px 64px; }
+      .points { grid-template-columns: 1fr; gap: 28px; }
+      .scope { margin-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">Petey<span class="dot">.</span></a>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <span class="eyebrow">Coming soon</span>
+      <h1>Your forms in.<br />Your data <em>out</em><span class="dot">.</span></h1>
+      <p class="sub">Petey reads filled PDF forms. Drop one in, and it recognizes the form and hands back every field as clean, structured data.</p>
+    </section>
+
+    <section class="steps-wrap">
+      <div class="steps">
+        <div class="step">
+          <div class="step-n">01</div>
+          <h2>Drop in a filled form</h2>
+          <p>Fillable PDFs, and the flattened or printed-to-PDF copies people actually send.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">02</div>
+          <h2>Petey knows the form</h2>
+          <p>It matches the document against its library of mapped forms. No template to pick, nothing to set up.</p>
+        </div>
+        <div class="step">
+          <div class="step-n">03</div>
+          <h2>Get your data</h2>
+          <p>Every field, named and typed, as JSON or CSV. One file or a stack of them.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how">
+      <div class="how-head">
+        <div class="label">How it works</div>
+        <h2>No LLM calls. No prompts. <em>No guessing.</em></h2>
+      </div>
+      <div class="points">
+        <div class="point">
+          <h3>No AI reads your documents</h3>
+          <p>Extraction is plain code. Your PDF is never sent to a language model or any other AI service, so there is nothing to prompt, no API keys to bring and no per-page model bill.</p>
+        </div>
+        <div class="point">
+          <h3>Each form is mapped ahead of time</h3>
+          <p>Every form in the library is mapped once, field by field: where each answer sits, what it is called and what kind of value it holds.</p>
+        </div>
+        <div class="point">
+          <h3>No third parties</h3>
+          <p>Reading a form makes no outside calls: no AI provider, no external API. Your document is read where Petey runs and is not passed along to anyone else.</p>
+        </div>
+        <div class="point">
+          <h3>Same PDF, same answer</h3>
+          <p>No model means no drift between runs. A form takes about a second, and reading it twice gives you the same data twice.</p>
+        </div>
+      </div>
+      <p class="scope">Starting with common forms in tax, immigration, insurance, healthcare and benefits.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">Petey<span class="dot">.</span></div>
+      <div class="footer-meta">
+        <span>Petey &copy; 2026</span>
+        <span class="footer-note">Because PDFs are terrible.</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
